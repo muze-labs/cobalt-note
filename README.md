@@ -84,3 +84,11 @@ Then open:
 2. Clarify and document the `NotebookNoteAdapter` contract.
 3. Add a second simple note type to test whether the adapter is generic enough.
 4. Convert packages from TypeScript to simple JavaScript with JSDoc for public APIs.
+
+## TODO
+
+- Validate annotation attributes and link destinations in the rich-text renderer.
+  It currently escapes fragment text but emits recognized annotation tags with
+  their stored attributes unchanged. Keep this responsibility in Cobalt so the
+  editor and consuming apps share the same behavior; margin-notes should only
+  bind the renderer's output. Deferred for now (2026-10-30).
