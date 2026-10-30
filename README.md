@@ -14,7 +14,7 @@ packages/
   example-app/      Browser examples using the packages.
 ```
 
-### `@cobalt/note-core`
+### `@muze-labs/cobalt-note-core`
 
 Contains reusable low-level browser helpers that future note types may need:
 
@@ -26,7 +26,7 @@ Contains reusable low-level browser helpers that future note types may need:
 
 This is where complex selection/cursor handling should gradually move so custom note authors do not have to reimplement it.
 
-### `@cobalt/rich-text-note`
+### `@muze-labs/cobalt-rich-text-note`
 
 Contains the current fragment-based rich text note editor:
 
@@ -37,7 +37,7 @@ Contains the current fragment-based rich text note editor:
 - clipboard support
 - the `edit(element, fragment)` note editor
 
-### `@cobalt/notebook`
+### `@muze-labs/cobalt-notebook`
 
 Contains generic notebook coordination logic:
 
@@ -48,7 +48,7 @@ Contains generic notebook coordination logic:
 
 It talks to notes through a `NotebookNoteAdapter`, so future note types do not need to be based on the rich text note editor.
 
-### `@cobalt/example-app`
+### `@muze-labs/cobalt-example-app`
 
 Contains the current browser examples. The app owns notebook-level shortcuts, the note list, and focus after structural changes. Each note owns its local keyboard interpretation and can emit an intent event such as `cobalt:request-remove-note`; the app decides whether to perform that operation.
 
@@ -80,7 +80,7 @@ Then open:
 
 ## Next planned refactors
 
-1. Extract more generic helpers into `@cobalt/note-core`.
+1. Extract more generic helpers into `@muze-labs/cobalt-note-core`.
 2. Clarify and document the `NotebookNoteAdapter` contract.
 3. Add a second simple note type to test whether the adapter is generic enough.
 4. Convert packages from TypeScript to simple JavaScript with JSDoc for public APIs.

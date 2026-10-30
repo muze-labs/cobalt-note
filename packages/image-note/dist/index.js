@@ -1,4 +1,4 @@
-import { edit, RICH_TEXT_NOTE_FRAGMENT_TYPE } from "@cobalt/rich-text-note";
+import { edit, RICH_TEXT_NOTE_FRAGMENT_TYPE } from "@muze-labs/cobalt-rich-text-note";
 export const IMAGE_NOTE_FRAGMENT_TYPE = "image";
 export function editImageNote(element, value, options = {}) {
     if (!isImageNoteValue(value)) {

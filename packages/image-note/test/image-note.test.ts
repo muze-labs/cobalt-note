@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
 import { describe, expect, test } from "vitest";
-import { NotebookController } from "@cobalt/notebook";
-import { editCodeNote } from "@cobalt/code-note";
+import { NotebookController } from "@muze-labs/cobalt-notebook";
+import { editCodeNote } from "@muze-labs/cobalt-code-note";
 import {
     editImageNote,
     IMAGE_NOTE_FRAGMENT_TYPE,

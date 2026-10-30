@@ -1,5 +1,5 @@
 {
-  "name": "@cobalt/rich-text-note",
+  "name": "@muze-labs/cobalt-rich-text-note",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
     }
   },
   "dependencies": {
-    "@cobalt/note-core": "0.1.0"
+    "@muze-labs/cobalt-note-core": "0.1.0"
   },
   "scripts": {
     "build": "tsc -b",

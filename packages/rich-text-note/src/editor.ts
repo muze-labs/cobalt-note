@@ -24,7 +24,7 @@ import {
     isOffsetOnFirstVisualLine,
     isOffsetOnLastVisualLine,
     setSelectionRange
-} from "@cobalt/note-core";
+} from "@muze-labs/cobalt-note-core";
 
 export const RICH_TEXT_NOTE_FRAGMENT_TYPE = "cobalt.rich-text";
 

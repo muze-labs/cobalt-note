@@ -1,6 +1,6 @@
 import { EditorState } from "./editor-state.js";
 import { Fragment } from "./fragment.js";
-import { getSelectionRange } from "@cobalt/note-core";
+import { getSelectionRange } from "@muze-labs/cobalt-note-core";
 export declare const RICH_TEXT_NOTE_FRAGMENT_TYPE = "cobalt.rich-text";
 export interface RichTextNotebookFragment {
     type: typeof RICH_TEXT_NOTE_FRAGMENT_TYPE;

@@ -5,7 +5,7 @@ import { getClipboardFragment, readFragmentFromClipboard, writeFragmentToClipboa
 import { createAnnotationTag, createLinkAnnotationTag, defaultRegistry } from "./registry.js";
 import { render } from "./render.js";
 import { getEffectiveState, getTypingEffectiveState } from "./runs.js";
-import { getCaretClientRect, getOffsetAtPoint, getParagraphRangeAtPoint, getSelectionRange, getWordRangeAtPoint, isOffsetOnFirstVisualLine, isOffsetOnLastVisualLine, setSelectionRange } from "@cobalt/note-core";
+import { getCaretClientRect, getOffsetAtPoint, getParagraphRangeAtPoint, getSelectionRange, getWordRangeAtPoint, isOffsetOnFirstVisualLine, isOffsetOnLastVisualLine, setSelectionRange } from "@muze-labs/cobalt-note-core";
 export const RICH_TEXT_NOTE_FRAGMENT_TYPE = "cobalt.rich-text";
 function cloneFragment(fragment) {
     return {

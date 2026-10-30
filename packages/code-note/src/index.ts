@@ -3,7 +3,7 @@ import type {
     NotebookNoteAdapter,
     NotebookNoteFragment,
     NotebookNoteMergeResult
-} from "@cobalt/notebook";
+} from "@muze-labs/cobalt-notebook";
 
 export const CODE_NOTE_FRAGMENT_TYPE = "text/code";
 

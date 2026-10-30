@@ -150,7 +150,7 @@ code note currently rejects all commands.
 
 ## Image notes and captions
 
-`@cobalt/image-note` combines an indivisible image with an editable rich-text
+`@muze-labs/cobalt-image-note` combines an indivisible image with an editable rich-text
 caption. It declines splitting and merging the note, but accepts rich-text
 fragments inserted at caption offsets (`1` and above). Multi-fragment paste is
 declined because the notebook would need to split the enclosing image note.
@@ -194,7 +194,7 @@ still needs an explicit notebook/application contract.
 
 ## Code note textarea limitation
 
-`@cobalt/code-note` currently uses a native `<textarea>`. This keeps the note type
+`@muze-labs/cobalt-code-note` currently uses a native `<textarea>`. This keeps the note type
 small and preserves native text editing behavior, but native textarea selection
 cannot visually participate in notebook-level selections that span multiple notes.
 

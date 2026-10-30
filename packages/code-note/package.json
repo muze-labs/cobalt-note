@@ -1,5 +1,5 @@
 {
-  "name": "@cobalt/code-note",
+  "name": "@muze-labs/cobalt-code-note",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -8,7 +8,7 @@
     "build": "tsc -b"
   },
   "dependencies": {
-    "@cobalt/notebook": "0.1.0"
+    "@muze-labs/cobalt-notebook": "0.1.0"
   },
   "devDependencies": {
     "typescript": "^5.8.0"

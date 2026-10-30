@@ -1,7 +1,7 @@
 /* @vitest-environment jsdom */
 import { describe, expect, test } from "vitest";
-import { NotebookController } from "@cobalt/notebook";
-import { edit as editRichText, RICH_TEXT_NOTE_FRAGMENT_TYPE } from "@cobalt/rich-text-note";
+import { NotebookController } from "@muze-labs/cobalt-notebook";
+import { edit as editRichText, RICH_TEXT_NOTE_FRAGMENT_TYPE } from "@muze-labs/cobalt-rich-text-note";
 import {
     CODE_NOTE_FRAGMENT_TYPE,
     editCodeNote,

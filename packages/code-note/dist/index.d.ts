@@ -1,4 +1,4 @@
-import type { NotebookNoteAdapter, NotebookNoteFragment } from "@cobalt/notebook";
+import type { NotebookNoteAdapter, NotebookNoteFragment } from "@muze-labs/cobalt-notebook";
 export declare const CODE_NOTE_FRAGMENT_TYPE = "text/code";
 export interface CodeNoteValue {
     text: string;
