@@ -3,13 +3,13 @@ import type {
     NotebookNoteAdapter,
     NotebookNoteFragment,
     NotebookNoteMergeResult
-} from "@cobalt/notebook";
+} from "@muze-labs/cobalt-notebook";
 import {
     edit,
     RICH_TEXT_NOTE_FRAGMENT_TYPE,
     type Fragment,
     type Editor as RichTextEditor
-} from "@cobalt/rich-text-note";
+} from "@muze-labs/cobalt-rich-text-note";
 
 export const IMAGE_NOTE_FRAGMENT_TYPE = "image";
 

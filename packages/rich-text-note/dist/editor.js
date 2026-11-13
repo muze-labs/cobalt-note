@@ -5,8 +5,9 @@ import { getClipboardFragment, readFragmentFromClipboard, writeFragmentToClipboa
 import { createAnnotationTag, createLinkAnnotationTag, defaultRegistry } from "./registry.js";
 import { render } from "./render.js";
 import { getEffectiveState, getTypingEffectiveState } from "./runs.js";
-import { getCaretClientRect, getOffsetAtPoint, getParagraphRangeAtPoint, getSelectionRange, getWordRangeAtPoint, isOffsetOnFirstVisualLine, isOffsetOnLastVisualLine, setSelectionRange } from "@cobalt/note-core";
+import { getCaretClientRect, getOffsetAtPoint, getParagraphRangeAtPoint, getSelectionRange, getWordRangeAtPoint, isOffsetOnFirstVisualLine, isOffsetOnLastVisualLine, setSelectionRange } from "@muze-labs/cobalt-note-core";
 export const RICH_TEXT_NOTE_FRAGMENT_TYPE = "cobalt.rich-text";
+export const RICH_TEXT_NOTE_CHANGE_EVENT = "cobalt:change";
 function cloneFragment(fragment) {
     return {
         text: fragment.text,
@@ -15,6 +16,17 @@ function cloneFragment(fragment) {
             range: [...annotation.range]
         }))
     };
+}
+function sameFragment(left, right) {
+    return left.text === right.text
+        && left.annotations.length === right.annotations.length
+        && left.annotations.every((annotation, index) => {
+            const other = right.annotations[index];
+            return annotation.range[0] === other.range[0]
+                && annotation.range[1] === other.range[1]
+                && annotation.tag === other.tag
+                && annotation.order === other.order;
+        });
 }
 function replaceFragment(target, source) {
     target.text = source.text;
@@ -65,14 +77,43 @@ function renderDecoratedFragment(fragment, ranges, active = true) {
 }
 export function edit(element, fragment) {
     const state = createEditorState();
+    let lastNotifiedFragment = cloneFragment(fragment);
+    let destroyed = false;
+    let composition = null;
+    let abandonedComposition = false;
     let selectionDecorationRanges = [];
     let selectionDecorationActive = true;
+    function notifyChange() {
+        const unchanged = sameFragment(fragment, lastNotifiedFragment);
+        if (destroyed || unchanged) {
+            return;
+        }
+        // Retain a separate baseline before dispatch: listeners may synchronously
+        // set another value or mutate their event snapshot.
+        lastNotifiedFragment = cloneFragment(fragment);
+        element.dispatchEvent(new CustomEvent(RICH_TEXT_NOTE_CHANGE_EVENT, {
+            bubbles: true,
+            detail: { fragment: cloneFragment(fragment) }
+        }));
+    }
     function rerender(start, end) {
+        if (composition) {
+            if (sameFragment(fragment, composition)) {
+                // Selection decoration must not replace the browser's active
+                // composition DOM. Render it when the composition has ended.
+                return;
+            }
+            // An explicit API edit takes precedence over a now-stale native
+            // composition. Its eventual end must not overwrite the new value.
+            composition = null;
+            abandonedComposition = true;
+        }
         element.innerHTML = renderDecoratedFragment(fragment, selectionDecorationRanges, selectionDecorationActive);
         if (start !== undefined &&
             end !== undefined) {
             setSelectionRange(element, start, end);
         }
+        notifyChange();
     }
     const editor = {
         element,
@@ -83,6 +124,9 @@ export function edit(element, fragment) {
         },
         getValue() {
             return cloneFragment(fragment);
+        },
+        isComposing() {
+            return composition !== null || abandonedComposition;
         },
         setValue(value) {
             if (!isFragment(value)) {
@@ -230,6 +274,11 @@ export function edit(element, fragment) {
             return true;
         },
         destroy() {
+            destroyed = true;
+            composition = null;
+            abandonedComposition = false;
+            element.removeEventListener("compositionstart", handleCompositionStart);
+            element.removeEventListener("compositionend", handleCompositionEnd);
             element.removeEventListener("keydown", handleKeyDown);
             element.removeEventListener("beforeinput", handleBeforeInput);
             element.removeEventListener("copy", handleCopy);
@@ -239,6 +288,9 @@ export function edit(element, fragment) {
         }
     };
     function handleKeyDown(event) {
+        if (editor.isComposing() || event.isComposing) {
+            return;
+        }
         if (event.key === "Enter") {
             if (event.ctrlKey || event.metaKey || event.altKey) {
                 return;
@@ -263,6 +315,9 @@ export function edit(element, fragment) {
     }
     function handleBeforeInput(event) {
         const inputEvent = event;
+        if (editor.isComposing() || inputEvent.isComposing) {
+            return;
+        }
         const selection = getSelectionRange(element);
         if (!selection) {
             return;
@@ -275,6 +330,78 @@ export function edit(element, fragment) {
         applyCommands(fragment, commands);
         const caret = getNextCaretPosition(inputEvent, selection.start, selection.end);
         rerender(caret, caret);
+    }
+    function handleCompositionStart() {
+        composition = cloneFragment(fragment);
+        abandonedComposition = false;
+    }
+    function compositionText() {
+        // Cobalt's trailing-newline sentinel is presentation, not user text.
+        const walker = element.ownerDocument.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+        let text = "";
+        let node = walker.nextNode();
+        while (node) {
+            if (!node.parentElement?.closest('[data-cobalt-sentinel="true"]')) {
+                text += node.textContent || "";
+            }
+            node = walker.nextNode();
+        }
+        return text;
+    }
+    function handleCompositionEnd() {
+        const before = composition;
+        composition = null;
+        if (!before) {
+            if (abandonedComposition) {
+                abandonedComposition = false;
+                // API rendering can itself end a composition synchronously.
+                queueMicrotask(() => {
+                    if (!destroyed && !editor.isComposing()) {
+                        rerender();
+                    }
+                });
+            }
+            return;
+        }
+        if (!sameFragment(fragment, before)) {
+            rerender();
+            return;
+        }
+        const text = compositionText();
+        const selection = getSelectionRange(element);
+        const focused = element.contains(element.ownerDocument.activeElement);
+        if (text === before.text) {
+            // Cancellation and a same-text commit leave the native fragment
+            // unchanged. Empty event.data alone cannot distinguish deletion.
+            rerender(focused ? selection?.start : undefined, focused ? selection?.end : undefined);
+            return;
+        }
+        let start = 0;
+        while (start < before.text.length && start < text.length
+            && before.text[start] === text[start]) {
+            start += 1;
+        }
+        let oldEnd = before.text.length;
+        let newEnd = text.length;
+        while (oldEnd > start && newEnd > start
+            && before.text[oldEnd - 1] === text[newEnd - 1]) {
+            oldEnd -= 1;
+            newEnd -= 1;
+        }
+        // Offsets use UTF-16, but a replacement must include whole code points.
+        const lowSurrogate = (value) => value >= 0xdc00 && value <= 0xdfff;
+        if (start > 0 && (lowSurrogate(before.text.charCodeAt(start))
+            || lowSurrogate(text.charCodeAt(start)))) {
+            start -= 1;
+        }
+        if (lowSurrogate(before.text.charCodeAt(oldEnd))) {
+            oldEnd += 1;
+            newEnd += 1;
+        }
+        const inserted = text.slice(start, newEnd);
+        applyCommands(fragment, buildInsertCommands(start, oldEnd, inserted));
+        const caret = start + inserted.length;
+        rerender(focused ? caret : undefined, focused ? caret : undefined);
     }
     function handleCopy(event) {
         const selection = getSelectionRange(element);
@@ -465,6 +592,8 @@ export function edit(element, fragment) {
     }
     element.contentEditable = "true";
     rerender();
+    element.addEventListener("compositionstart", handleCompositionStart);
+    element.addEventListener("compositionend", handleCompositionEnd);
     element.addEventListener("keydown", handleKeyDown);
     element.addEventListener("beforeinput", handleBeforeInput);
     element.addEventListener("copy", handleCopy);

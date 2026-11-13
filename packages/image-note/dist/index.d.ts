@@ -1,5 +1,5 @@
-import type { NotebookNoteAdapter, NotebookNoteFragment } from "@cobalt/notebook";
-import { type Fragment } from "@cobalt/rich-text-note";
+import type { NotebookNoteAdapter, NotebookNoteFragment } from "@muze-labs/cobalt-notebook";
+import { type Fragment } from "@muze-labs/cobalt-rich-text-note";
 export declare const IMAGE_NOTE_FRAGMENT_TYPE = "image";
 export interface ImageNoteValue {
     src: string;
