@@ -37,6 +37,54 @@ Contains the current fragment-based rich text note editor:
 - clipboard support
 - the `edit(element, fragment)` note editor
 
+The editor emits a bubbling `cobalt:change` event after an operation changes its
+text or annotations, once rendering and selection restoration are complete:
+
+```js
+import { edit, RICH_TEXT_NOTE_CHANGE_EVENT } from '@muze-labs/cobalt-rich-text-note';
+
+element.addEventListener(RICH_TEXT_NOTE_CHANGE_EVENT, (event) => {
+    const fragment = event.detail.fragment;
+    // Map this detached value into your app's data model or local draft store.
+    saveDraft(fragment);
+});
+const editor = edit(element, { text: '', annotations: [] });
+```
+
+Notifications are synchronous and contain a detached `{ text, annotations }`
+snapshot. Typing, deletion, newlines, paste, cut, formatting and mutating editor
+API calls (including `setValue`) use the same event. Mounting, equivalent values,
+no-op edits, focus, selection decorations and pending typing styles do not emit
+changes. `destroy()` stops notifications. Mutating the supplied fragment directly
+is not an observed editing API; use the editor methods instead.
+
+Storage and RDF mapping remain application responsibilities. Applications should
+queue asynchronous saves in order, handle failures, and avoid treating a
+`setValue` notification during restoration as a new user edit. Async listener
+completion is not awaited by the editor. TypeScript consumers can use the exported
+`RichTextNoteChangeDetail` type for `CustomEvent`.
+
+### Native text composition
+
+IME and composing phone-keyboard input stays under the browser's control until
+`compositionend`. At that point Cobalt applies the committed text through its
+normal fragment commands, preserves surrounding annotations and emits one
+`cobalt:change` for an actual change. Provisional candidates do not trigger
+saves. Cancellation with unchanged text emits no change.
+
+`editor.isComposing()` reports unfinished native input. Hosts should defer
+closing, saving a final snapshot, switching to a passive view or destroying an
+editor while it returns `true`. `getValue()` still returns the last committed
+fragment during composition. An explicit API edit supersedes the pending native
+composition; its later end cannot overwrite that newer value. Destroying the
+editor removes listeners and intentionally discards unfinished input.
+
+The implementation follows [UI Events composition events](https://www.w3.org/TR/uievents/#events-compositionevents)
+and [Input Events Level 2 composition ordering](https://www.w3.org/TR/input-events-2/#input-event-order-during-composition).
+It does not cancel composing input or rely on the relative ordering of
+`compositionupdate` and `beforeinput`. Empty `compositionend.data` can mean
+cancellation or deletion, so the final DOM text determines the change.
+
 ### `@muze-labs/cobalt-notebook`
 
 Contains generic notebook coordination logic:

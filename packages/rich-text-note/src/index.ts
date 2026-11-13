@@ -31,10 +31,12 @@ export type { Command } from "./commands.js";
 
 export {
     edit,
+    RICH_TEXT_NOTE_CHANGE_EVENT,
     RICH_TEXT_NOTE_FRAGMENT_TYPE
 } from "./editor.js";
 export type {
     Editor,
+    RichTextNoteChangeDetail,
     RichTextNotebookFragment,
     RichTextNotebookMergeResult
 } from "./editor.js";

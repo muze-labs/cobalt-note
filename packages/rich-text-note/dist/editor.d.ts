@@ -2,6 +2,10 @@ import { EditorState } from "./editor-state.js";
 import { Fragment } from "./fragment.js";
 import { getSelectionRange } from "@muze-labs/cobalt-note-core";
 export declare const RICH_TEXT_NOTE_FRAGMENT_TYPE = "cobalt.rich-text";
+export declare const RICH_TEXT_NOTE_CHANGE_EVENT = "cobalt:change";
+export interface RichTextNoteChangeDetail {
+    fragment: Fragment;
+}
 export interface RichTextNotebookFragment {
     type: typeof RICH_TEXT_NOTE_FRAGMENT_TYPE;
     data: Fragment;
@@ -16,6 +20,7 @@ export interface Editor {
     state: EditorState;
     getType(): typeof RICH_TEXT_NOTE_FRAGMENT_TYPE;
     getValue(): Fragment;
+    isComposing(): boolean;
     setValue(value: unknown): void;
     getLength(): number;
     getText(start?: number, end?: number): string;
