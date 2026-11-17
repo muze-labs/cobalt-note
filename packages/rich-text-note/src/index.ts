@@ -72,3 +72,6 @@ export {
     writeFragmentToClipboard,
     writeFragmentsToClipboard
 } from "./clipboard.js";
+
+export { fragmentFromHtml } from "./import-html.js";
+export type { HtmlImportOptions } from "./import-html.js";

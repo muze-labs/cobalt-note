@@ -37,6 +37,30 @@ Contains the current fragment-based rich text note editor:
 - clipboard support
 - the `edit(element, fragment)` note editor
 
+The public `fragmentFromHtml(html, { baseUrl? })` function imports HTML into a
+native fragment. Prefer an existing native Cobalt fragment when one is available;
+HTML import is a fallback for HTML-only content.
+
+```js
+import { fragmentFromHtml, render } from '@muze-labs/cobalt-rich-text-note';
+
+const fragment = fragmentFromHtml('<p>Hello <strong>world</strong></p>');
+const html = render(fragment);
+```
+
+The importer requires a browser DOM and supports text, `strong`/`b`, `em`/`i`,
+`u`, `a`, `br`, and `p`/`div` line boundaries. It preserves UTF-16 offsets,
+whitespace and blank lines, and recognizes the renderer's trailing-newline
+sentinel. Paragraph/container markup becomes newline-delimited text; it is not
+a preservation format for arbitrary HTML documents. Links support HTTP, HTTPS
+and mailto; relative links require an explicit source `baseUrl`.
+
+Unsupported elements, attributes, comments, document metadata and link protocols
+throw an error. Callers must keep the original content on failure and may offer
+a different editor. The importer does not sanitize arbitrary HTML for display,
+validate unrelated native fragments, or change clipboard behavior. Importing and
+rendering reproduce supported content, not its original HTML serialization.
+
 The editor emits a bubbling `cobalt:change` event after an operation changes its
 text or annotations, once rendering and selection restoration are complete:
 
