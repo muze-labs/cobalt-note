@@ -5,4 +5,5 @@ export { render } from "./render.js";
 export { generateRuns, getEffectiveState, getTypingEffectiveState } from "./runs.js";
 export { AnnotationRegistry, createAnnotationTag, createLinkAnnotationTag, defaultRegistry, parseAnnotationTag } from "./registry.js";
 export { COBALT_CLIPBOARD_MIME, COBALT_NOTEBOOK_CLIPBOARD_MIME, getClipboardFragment, readFragmentFromClipboard, readFragmentsFromClipboard, writeFragmentToClipboard, writeFragmentsToClipboard } from "./clipboard.js";
+export { fragmentFromHtml } from "./import-html.js";
 //# sourceMappingURL=index.js.map
